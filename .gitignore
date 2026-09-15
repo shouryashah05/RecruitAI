@@ -1,0 +1,14 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.pytest_cache/
+
+# Runtime data — resumes and generated reports contain candidate PII
+temp/
+
+# LangGraph checkpoint DB — contains full candidate pipeline state
+checkpoints.sqlite

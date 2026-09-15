@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "rubric_version": "AICTE 2019",
+  "description": "Deterministic eligibility criteria for technical university faculty hiring. The Evaluator node loads this file and applies pure-Python logic against extracted candidate data. The LLM is NEVER used for math or pass/fail logic.",
+  "eligibility_decisions": {
+    "Retain": "Candidate meets all mandatory criteria for the applied role.",
+    "Downgrade": "Candidate fails criteria for the applied role but qualifies for a lower role.",
+    "Reject": "Candidate fails all applicable role thresholds."
+  },
+  "roles": {
+    "Assistant Professor": {
+      "label": "Entry-level faculty",
+      "tier": 1,
+      "required_degrees": {
+        "b_tech": true,
+        "m_tech": true,
+        "phd": false
+      },
+      "first_class_condition": {
+        "fields": [
+          "b_tech_first_class",
+          "m_tech_first_class"
+        ],
+        "operator": "OR"
+      },
+      "first_class_rule": "First Class required in EITHER B.Tech OR M.Tech (at least one).",
+      "experience_years_required": 0,
+      "post_phd_experience_years_required": 0,
+      "publications_required": 0,
+      "phd_students_guided_required": 0
+    },
+    "Associate Professor": {
+      "label": "Mid-career faculty",
+      "tier": 1,
+      "required_degrees": {
+        "b_tech": false,
+        "m_tech": false,
+        "phd": true
+      },
+      "first_class_condition": {
+        "fields": [
+          "b_tech_first_class",
+          "m_tech_first_class",
+          "phd_award_first_class"
+        ],
+        "operator": "OR"
+      },
+      "first_class_rule": "First Class required in ANY ONE degree (B.Tech, M.Tech, or Ph.D. qualifying).",
+      "experience_years_required": 8,
+      "post_phd_experience_years_required": 2,
+      "publications_required": 6,
+      "phd_students_guided_required": 0
+    },
+    "Professor": {
+      "label": "Senior faculty - two qualification paths (A or B)",
+      "tier": 1,
+      "paths": {
+        "Path A": {
+          "description": "Leadership / PhD-supervision pathway",
+          "required_degrees": {
+            "b_tech": false,
+            "m_tech": false,
+            "phd": true
+          },
+          "first_class_condition": {
+            "fields": [
+              "b_tech_first_class",
+              "m_tech_first_class",
+              "phd_award_first_class"
+            ],
+            "operator": "OR"
+          },
+          "first_class_rule": "First Class required in ANY ONE degree.",
+          "experience_years_required": 10,
+          "post_phd_experience_years_required": 0,
+          "publications_required": 6,
+          "publications_context": "Must have been achieved at the Associate Professor level (i.e., publications after/promoted-to Associate).",
+          "phd_students_guided_required": 2
+        },
+        "Path B": {
+          "description": "Research / publications pathway",
+          "required_degrees": {
+            "b_tech": false,
+            "m_tech": false,
+            "phd": true
+          },
+          "first_class_condition": {
+            "fields": [
+              "b_tech_first_class",
+              "m_tech_first_class",
+              "phd_award_first_class"
+            ],
+            "operator": "OR"
+          },
+          "first_class_rule": "First Class required in ANY ONE degree.",
+          "experience_years_required": 10,
+          "post_phd_experience_years_required": 0,
+          "publications_required": 10,
+          "publications_context": "Total cumulative publications across the candidate's career.",
+          "phd_students_guided_required": 0
+        }
+      }
+    }
+  },
+  "tier2_comparative_scoring": {
+    "description": "Deterministic weighted score (0-100) used to rank retained candidates once Tier 1 eligibility is satisfied. Code computes this directly; the LLM does not.",
+    "max_score": 100,
+    "weights": {
+      "teaching_experience_years": 0.2,
+      "research_experience_years": 0.15,
+      "publications_count": 0.25,
+      "phd_awarded": 0.15,
+      "phd_students_guided": 0.15,
+      "first_class_count": 0.1
+    },
+    "benchmarks": {
+      "teaching_experience_years": 20,
+      "research_experience_years": 15,
+      "publications_count": 20,
+      "phd_awarded": 1,
+      "phd_students_guided": 10,
+      "first_class_count": 3
+    },
+    "notes": [
+      "Each metric is normalized to its benchmark maximum (clamped to 1.0) before weighting.",
+      "score_breakdown in EvaluationResult reports each metric's weighted contribution out of 100.",
+      "Only candidates with Tier 1 decision == 'Retain' are meaningfully ranked by this score."
+    ]
+  }
+}
